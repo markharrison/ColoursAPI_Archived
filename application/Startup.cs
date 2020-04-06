@@ -30,6 +30,7 @@ namespace ColoursAPI
         {
             services.AddSingleton<ColoursService>(new ColoursService(Configuration));
             services.AddControllers();
+            services.AddCors();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
@@ -63,6 +64,12 @@ namespace ColoursAPI
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors(builder =>
+                        builder.WithOrigins("http://localhost")
+                                .AllowAnyOrigin()
+                                .AllowAnyHeader()
+                                .AllowAnyMethod());
 
             app.UseSwagger();
 
