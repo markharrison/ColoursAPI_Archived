@@ -1,3 +1,0 @@
-# ColourAPI
-
-ColourAPI Application
