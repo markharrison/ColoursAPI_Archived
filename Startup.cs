@@ -50,6 +50,8 @@ namespace ColoursAPI
                     }
                 }
                 );
+
+                c.EnableAnnotations();
             });
         }
 

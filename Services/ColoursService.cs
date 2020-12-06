@@ -9,21 +9,16 @@ namespace ColoursAPI.Services
 {
     public class ColoursService
     {
-        private List<ColoursItem> _listColors;  // This will only work for a single instance of the service ... to be replaced by datastore
+        private List<ColoursItem> _listColors = new() {  };  // This will only work for a single instance of the service ... to be replaced by datastore
 
         public ColoursService(IConfiguration config)
         {
-
-            _listColors = new List<ColoursItem> {
-                new ColoursItem {Id = 1, Name = "red" },
-                new ColoursItem {Id = 2, Name = "yellow" },
-                new ColoursItem {Id = 3, Name = "black" }
-            };
+            _ = Reset();
 
             return;
         }
 
-        public async Task<IEnumerable<ColoursItem>> GetAll()
+        public async Task<List<ColoursItem>> GetAll()
         {
             await Task.Run(() => { });
 
@@ -36,6 +31,22 @@ namespace ColoursAPI.Services
             ColoursItem _colourItem = _listColors.Find(x => x.Id == id);
 
             await Task.Run(() => { });
+
+            return _colourItem;
+
+        }
+
+        public async Task<ColoursItem> GetByName(string pName)
+        {
+            await Task.Run(() => { });
+
+            ColoursItem _colourItem = null;
+
+            int idxName = _listColors.FindIndex(a => a.Name.ToLower() == pName.ToLower().Trim());
+            if (idxName >= 0)
+            {
+                _colourItem = _listColors[idxName];
+            }
 
             return _colourItem;
 
@@ -106,17 +117,17 @@ namespace ColoursAPI.Services
 
         }
 
-        public async Task<IEnumerable<ColoursItem>> GetRandom()
+        public async Task<ColoursItem> Reset()
         {
-            await Task.Run(() => { });
+            await DeleteAll();
 
-            List<ColoursItem> _listRandomColors = new List<ColoursItem> {
-                new ColoursItem {Id = 1, Name = "blue" },
-                new ColoursItem {Id = 2, Name = "darkblue" },
-                new ColoursItem {Id = 3, Name = "lightblue" }
-            };
+            await UpdateById(1, new ColoursItem { Id = 1, Name = "blue", Data = null }); ;
+            await UpdateById(2, new ColoursItem { Id = 2, Name = "darkblue", Data = null });
+            await UpdateById(3, new ColoursItem { Id = 2, Name = "lightblue", Data = null });
 
-            return _listRandomColors;
+
+            return null;
+
         }
 
     }

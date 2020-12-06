@@ -6,10 +6,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ColoursAPI.Services;
 using ColoursAPI.Models;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace ColoursAPI.Controllers
 {
-    [Route("[controller]")]
+    [Route("colours")]
     [ApiController]
     public class ColoursController : ControllerBase
     {
@@ -20,90 +21,61 @@ namespace ColoursAPI.Controllers
             _ColoursService = ColoursService;
         }
 
-        [HttpGet(Name = "GetColours")]
-        [ProducesResponseType(typeof(List<ColoursItem>), StatusCodes.Status200OK)]
+
+        [HttpGet]
+        [SwaggerOperation(
+            Summary = "Get colours",
+            Description = "Returns all colours.",
+            OperationId = "GetColours",
+            Tags = new[] { "Colours" }
+        )]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success - returns list of colours", typeof(List<ColoursItem>))]
         public async Task<IActionResult> GetAllAsync()
         {
-            IEnumerable<ColoursItem> _ColoursList;
+            List<ColoursItem> _ColoursList;
             _ColoursList = await _ColoursService.GetAll();
             return Ok(_ColoursList);
         }
 
-        [HttpGet("{id}", Name = "GetColoursById")]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ColoursItem), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetByIdAsync(int id)
+        [HttpPost]
+        [SwaggerOperation(
+            Summary = "Update / create colours",
+            Description = "Updates colours - creates colour if it doesn't exist",
+            OperationId = "UpdateColours",
+            Tags = new[] { "Colours" }
+        )]
+        [SwaggerResponse(StatusCodes.Status201Created, "Success - colours updated/created", typeof(ColoursItem))]
+        [SwaggerResponse(StatusCodes.Status422UnprocessableEntity, "Unprocessable Entity", typeof(ProblemDetails))]
+        public async Task<IActionResult> UpdateAsync(
+            [FromBody, SwaggerRequestBody("Colours to update", Required = true)] List<ColoursItem> coloursItems)
         {
-            if (id < 0 || id > 1000)
+            List<ColoursItem> _ColoursInserted = new() { };
+
+            foreach (ColoursItem coloursItem in coloursItems) // Loop through List with foreach
             {
-                return UnprocessableEntity(new ProblemDetails { Status = 422, Title = "Unprocessable Entity - {id} must be between 0 and 1000" });
+                if (coloursItem.Name == null || coloursItem.Name.Length == 0)
+                {
+                    return UnprocessableEntity(new ProblemDetails { Status = 422, Title = "Missing a Colour Name" });
+                }
+
+                ColoursItem coloursItemReturn = await _ColoursService.UpdateById(0, coloursItem);
+                _ColoursInserted.Add(coloursItemReturn);
+
             }
 
-            ColoursItem _ColoursItem = await _ColoursService.GetById(id);
-            if (_ColoursItem == null)
-            {
-                return NotFound(new ProblemDetails { Status = 404, Title = "Not Found" });
-            }
+            List<ColoursItem> _ColoursList = await _ColoursService.GetAll();
 
-            return Ok(_ColoursItem);
+            return Created("Colours/", _ColoursInserted);
         }
 
-        [HttpPost(Name = "UpdateColours")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> UpdateAsync([FromBody] ColoursItem coloursItemUpdate)
-        {
-            if (coloursItemUpdate.Name == null || coloursItemUpdate.Name.Length == 0)
-            {
-                return UnprocessableEntity(new ProblemDetails { Status = 422, Title = "Unprocessable Entity - Needs a Colour Name" });
-            }
-
-            ColoursItem coloursItemReturn = await _ColoursService.UpdateById(0, coloursItemUpdate);
-
-            return Created("Colours/" + coloursItemReturn.Id, coloursItemReturn);
-        }
-
-        [HttpPut("{id}", Name = "UpdateColoursById")]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> UpdateByIdAsync(int id, [FromBody] ColoursItem coloursItemUpdate)
-        {
-            if (id < 0 || id > 1000)
-            {
-                return UnprocessableEntity(new ProblemDetails { Status = 422, Title = "Unprocessable Entity - {id} must be between 0 and 1000" });
-            }
-            if (coloursItemUpdate.Name == null || coloursItemUpdate.Name.Length == 0)
-            {
-                return UnprocessableEntity(new ProblemDetails { Status = 422, Title = "Unprocessable Entity - Needs a Colour Name" });
-            }
-
-            if (coloursItemUpdate.Id != id)
-            {
-                return UnprocessableEntity(new ProblemDetails { Status = 400, Title = "Unprocessable Entity - payload Id doesnt match parameter Id" });
-            }
-
-            ColoursItem coloursItemReturn = await _ColoursService.UpdateById(id, coloursItemUpdate);
-
-            return Created("Colours/" + id, coloursItemReturn);
-
-        }
-
-        [HttpDelete("{id}", Name = "DeleteColoursById")]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> DeleteByIdAsync(int id)
-        {
-            if (id < 0 || id > 1000)
-            {
-                return UnprocessableEntity( new ProblemDetails { Status = 422, Title = "Unprocessable Entity - {id} must be between 0 and 1000" });
-            }
-
-            await _ColoursService.DeleteById(id);
-
-            return NoContent();
-        }
-
-        [HttpDelete(Name = "DeleteColours")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [HttpDelete]
+        [SwaggerOperation(
+            Summary = "Delete colours",
+            Description = "Deletes all colours.",
+            OperationId = "DeletesColours",
+            Tags = new[] { "Colours" }
+        )]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "Success - all colours deleted", typeof(ColoursItem))]
         public async Task<IActionResult> DeleteAllAsync()
         {
 
@@ -112,23 +84,177 @@ namespace ColoursAPI.Controllers
             return NoContent();
         }
 
-        [Route("Random")]
-        [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetRandomAsync()
+        [HttpGet("{colourId}")]
+        [SwaggerOperation(
+            Summary = "Get colour by id",
+            Description = "Returns colour specified by {colourId} (must be between 1 and 1000).",
+            OperationId = "GetColourById",
+            Tags = new[] { "Colours" }
+        )]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success - returns colour", typeof(ColoursItem))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Not Found", typeof(ProblemDetails))]
+        [SwaggerResponse(StatusCodes.Status422UnprocessableEntity, "Unprocessable Entity", typeof(ProblemDetails))]
+        public async Task<IActionResult> GetByIdAsync(
+            [FromRoute, SwaggerParameter("Id of Colour to return", Required = true)] int colourId)
         {
-            List<ColoursItem> _listRandomColors = new List<ColoursItem> {
-                new ColoursItem {Id = 1, Name = "blue" },
-                new ColoursItem {Id = 2, Name = "darkblue" },
-                new ColoursItem {Id = 3, Name = "lightblue" }
-            };
+            if (colourId < 1 || colourId > 1000)
+            {
+                return UnprocessableEntity(new ProblemDetails { Status = 422, Title = "{colourId} must be between 1 and 1000" });
+            }
 
-            await Task.Run(() => { });
+            ColoursItem _ColoursItem = await _ColoursService.GetById(colourId);
+            if (_ColoursItem == null)
+            {
+                return NotFound(new ProblemDetails { Status = 404, Title = "Not Found - {colourId}: " + colourId });
+            }
+
+            return Ok(_ColoursItem);
+        }
+
+        [HttpPost("{colourId}")]
+        [SwaggerOperation(
+            Summary = "Update / create colour by id",
+            Description = "Updates colour specified by {colourId} (must be between 1 and 1000);  use {colourId} = 0 to insert new color",
+            OperationId = "UpdateColourById",
+            Tags = new[] { "Colours" }
+        )]
+        [SwaggerResponse(StatusCodes.Status201Created, "Success - colour created/updated", typeof(ColoursItem))]
+        [SwaggerResponse(StatusCodes.Status422UnprocessableEntity, "Unprocessable Entity", typeof(ProblemDetails))]
+        public async Task<IActionResult> UpdateByIdAsync(
+                    [FromRoute, SwaggerParameter("Id of Colour to update", Required = true)] int colourId,
+                    [FromBody, SwaggerRequestBody("Colours to update", Required = true)] ColoursItem coloursItemUpdate)
+        {
+            if (colourId < 0 || colourId > 1000)
+            {
+                return UnprocessableEntity(new ProblemDetails { Status = 422, Title = "Unprocessable Entity - {id} must be between 0 and 1000" });
+            }
+            if (coloursItemUpdate.Name == null || coloursItemUpdate.Name.Length == 0)
+            {
+                return UnprocessableEntity(new ProblemDetails { Status = 422, Title = "Unprocessable Entity - Needs a Colour Name" });
+            }
+            if (coloursItemUpdate.Id != colourId)
+            {
+                return UnprocessableEntity(new ProblemDetails { Status = 422, Title = "Unprocessable Entity - payload Id doesnt match {colourId}" });
+            }
+
+            ColoursItem coloursItemReturn = await _ColoursService.UpdateById(colourId, coloursItemUpdate);
+
+            return Created("Colours/" + colourId, coloursItemReturn);
+
+        }
+
+        [HttpDelete("{colourId}")]
+        [SwaggerOperation(
+            Summary = "Delete colour by id",
+            Description = "Deletes colour specified by {colourId} (must be between 1 and 1000).",
+            OperationId = "DeleteColourById",
+            Tags = new[] { "Colours" }
+        )]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "Success - colour deleted", typeof(ColoursItem))]
+        [SwaggerResponse(StatusCodes.Status422UnprocessableEntity, "Unprocessable Entity", typeof(ProblemDetails))]
+        public async Task<IActionResult> DeleteByIdAsync(
+            [FromRoute, SwaggerParameter("Id of Colour to delete", Required = true)] int colourId)
+        {
+            if (colourId < 1 || colourId > 1000)
+            {
+                return UnprocessableEntity(new ProblemDetails { Status = 422, Title = "Unprocessable Entity - {id} must be between 1 and 1000" });
+            }
+
+            await _ColoursService.DeleteById(colourId);
+
+            return NoContent();
+        }
+
+        //[Route("findbyname")]
+        //[HttpGet]
+        //[SwaggerOperation(
+        //        Summary = "Find colour by name",
+        //        Description = "Returns colour",
+        //        OperationId = "GetRandomColour",
+        //        Tags = new[] { "Colours" }
+        //    )]
+        //[SwaggerResponse(StatusCodes.Status200OK, "Success - returns random colour", typeof(ColoursItem))]
+        //[SwaggerResponse(StatusCodes.Status404NotFound, "Not Found", typeof(ProblemDetails))]
+        //public async Task<IActionResult> FindByNameAsync()
+        //{
+        //    List<ColoursItem> _ColoursList = await _ColoursService.GetAll();
+        //    if (_ColoursList.Count == 0)
+        //    {
+        //        return NotFound(new ProblemDetails { Status = 404, Title = "Not Found - no colors exist" });
+        //    }
+
+        //    Random rnd = new Random();
+        //    int rndInt = rnd.Next(_ColoursList.Count);
+
+        //    return Ok(_ColoursList[rndInt]);
+        //}
+
+        [Route("findbyname")]
+        [HttpGet]
+        [SwaggerOperation(
+             Summary = "Get colour by name",
+             Description = "Returns colour specified by {colourName} ",
+             OperationId = "GetColourByName",
+             Tags = new[] { "Colours" }
+         )]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success - returns colour", typeof(ColoursItem))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Not Found", typeof(ProblemDetails))]
+        public async Task<IActionResult> GetByNameAsync(
+            [FromQuery, SwaggerParameter("Name of Colour to return", Required = true)] string colourName)
+        {
+
+            ColoursItem _ColoursItem = await _ColoursService.GetByName(colourName);
+            if (_ColoursItem == null)
+            {
+                return NotFound(new ProblemDetails { Status = 404, Title = "Not Found - {colourName}: " + colourName });
+            }
+
+            return Ok(_ColoursItem);
+        }
+
+
+        [Route("random")]
+        [HttpGet]
+        [SwaggerOperation(
+            Summary = "Get random colour",
+            Description = "Returns random colour.",
+            OperationId = "GetRandomColour",
+            Tags = new[] { "Colours" }
+        )]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success - returns random colour", typeof(ColoursItem))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Not Found", typeof(ProblemDetails))]
+        public async Task<IActionResult> RandomAsync()
+        {
+            List<ColoursItem> _ColoursList = await _ColoursService.GetAll();
+            if (_ColoursList.Count == 0)
+            {
+                return NotFound(new ProblemDetails { Status = 404, Title = "Not Found - no colors exist"});
+            }
 
             Random rnd = new Random();
-            int rndInt = rnd.Next(_listRandomColors.Count);
+            int rndInt = rnd.Next(_ColoursList.Count);
 
-            return Ok(_listRandomColors[rndInt]);
+            return Ok(_ColoursList[rndInt]);
         }
+
+        [Route("reset")]
+        [HttpPost]
+        [SwaggerOperation(
+            Summary = "Reset colours",
+            Description = "Reset colours to default.",
+            OperationId = "ResetColours",
+            Tags = new[] { "Colours" }
+        )]
+        [SwaggerResponse(StatusCodes.Status201Created, "Success - colours reset", typeof(ColoursItem))]
+        public async Task<IActionResult> ResetAsync()
+        {
+
+            await _ColoursService.Reset();
+
+            List<ColoursItem> _ColoursList = await _ColoursService.GetAll();
+
+            return Created("Colours/", _ColoursList);
+        }
+
     }
 }
