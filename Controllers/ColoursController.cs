@@ -165,30 +165,6 @@ namespace ColoursAPI.Controllers
             return NoContent();
         }
 
-        //[Route("findbyname")]
-        //[HttpGet]
-        //[SwaggerOperation(
-        //        Summary = "Find colour by name",
-        //        Description = "Returns colour",
-        //        OperationId = "GetRandomColour",
-        //        Tags = new[] { "Colours" }
-        //    )]
-        //[SwaggerResponse(StatusCodes.Status200OK, "Success - returns random colour", typeof(ColoursItem))]
-        //[SwaggerResponse(StatusCodes.Status404NotFound, "Not Found", typeof(ProblemDetails))]
-        //public async Task<IActionResult> FindByNameAsync()
-        //{
-        //    List<ColoursItem> _ColoursList = await _ColoursService.GetAll();
-        //    if (_ColoursList.Count == 0)
-        //    {
-        //        return NotFound(new ProblemDetails { Status = 404, Title = "Not Found - no colors exist" });
-        //    }
-
-        //    Random rnd = new Random();
-        //    int rndInt = rnd.Next(_ColoursList.Count);
-
-        //    return Ok(_ColoursList[rndInt]);
-        //}
-
         [Route("findbyname")]
         [HttpGet]
         [SwaggerOperation(
