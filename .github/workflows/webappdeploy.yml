@@ -1,0 +1,33 @@
+name: WebApp Deploy
+on:
+  workflow_dispatch:
+env:
+  AZURE_WEBAPP_NAME: coloursapi
+  DOTNET_CORE_VERSION: 5.0.x
+  PROJECT_PATH: .
+jobs:
+  build_deploy:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core SDK ${{ env.DOTNET_CORE_VERSION }}
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+    - name: Restore packages
+      run: dotnet restore  
+    - name: Build app
+      run: dotnet build --configuration Release --no-restore
+    - name: Publish app for deploy
+      run: dotnet publish --configuration Release --no-build --output ./published
+    - name: Deploy to Azure WebApp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.PUBLISHING_PROFILE }}
+        package: ./published
+    - name: Publish Artifacts
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: coloursapi
+        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
