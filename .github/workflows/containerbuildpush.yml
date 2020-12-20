@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 env:
   IMAGENAME: coloursapi
-  IMAGETAG: R${{ github.run_number }}
+  IMAGETAG: V${{ github.run_number }}
 jobs:
   build:
     runs-on: ubuntu-20.04
