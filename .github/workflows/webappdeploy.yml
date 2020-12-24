@@ -28,5 +28,5 @@ jobs:
     - name: Publish Artifacts
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: coloursapi
+        name: ${{ env.AZURE_WEBAPP_NAME }}
         path: ./published
