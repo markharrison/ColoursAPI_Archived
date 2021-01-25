@@ -40,7 +40,7 @@ namespace ColoursAPI
                     Contact = new OpenApiContact
                     {
                         Name = "Mark Harrison",
-                        Email = string.Empty,
+                        Email = "mark.coloursapi@harrison.ws",
                         Url = new Uri("https://github.com/markharrison"),
                     },
                     License = new OpenApiLicense
@@ -52,6 +52,15 @@ namespace ColoursAPI
                 );
 
                 c.EnableAnnotations();
+
+                string strURL = Configuration.GetValue<string>("ServerURL");
+                if (strURL != null && strURL != "")
+                {
+                    c.AddServer(new OpenApiServer()
+                    {
+                        Url = strURL
+                    });
+                }
             });
         }
 
