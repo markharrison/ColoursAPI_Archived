@@ -28,16 +28,7 @@ namespace ColoursAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
-            services.AddSingleton<AppConfig>(op =>
-            {
-                AppConfig appconfig = new AppConfig(config);
-
-                services.AddSingleton(new ColoursService(appconfig));
-
-                return appconfig;
-            });
-
+            services.AddSingleton(new ColoursService(config));
             services.AddControllers();
             services.AddCors();
             services.AddSwaggerGen(c =>
@@ -76,7 +67,7 @@ namespace ColoursAPI
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, AppConfig appconfig)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ColoursService cs)
         {
             if (env.IsDevelopment())
             {
@@ -100,7 +91,7 @@ namespace ColoursAPI
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/appconfiginfo", async context => await context.Response.WriteAsync(appconfig.GetAppConfigInfo()));
+                endpoints.MapGet("/appconfiginfo", async context => await context.Response.WriteAsync(cs.GetAppConfigInfo()));
                 endpoints.MapControllers();
             });
         }

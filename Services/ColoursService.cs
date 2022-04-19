@@ -11,13 +11,13 @@ namespace ColoursAPI.Services
     {
         private List<ColoursItem> _listColors = new() {  };  // This will only work for a single instance of the service ... to be replaced by datastore
 
-        private AppConfig _appconfig;
+        private IConfiguration _config;
 
-        public ColoursService(AppConfig appconfig)
+        public ColoursService(IConfiguration config)
         {
             _ = Reset();
 
-            _appconfig = appconfig;
+            _config = config;
 
             return;
         }
@@ -134,5 +134,25 @@ namespace ColoursAPI.Services
 
         }
 
+        public string GetAppConfigInfo()
+        {
+            string strAppConfigInfoHtml = "";
+            strAppConfigInfoHtml += "<html><head>";
+            strAppConfigInfoHtml += "<style>";
+            strAppConfigInfoHtml += "body { font-family: \"Segoe UI\",Roboto,\"Helvetica Neue\",Arial;}";
+            strAppConfigInfoHtml += "</style>";
+            strAppConfigInfoHtml += "</head><body>";
+            strAppConfigInfoHtml += "<h3>ColoursAPI - AppConfigInfo </h3>";
+            strAppConfigInfoHtml += "OS Description: " + System.Runtime.InteropServices.RuntimeInformation.OSDescription + "<br/>";
+            strAppConfigInfoHtml += "Framework Description: " + System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription + "<br/>";
+            strAppConfigInfoHtml += "ASPNETCORE_ENVIRONMENT: " + _config.GetValue<string>("ASPNETCORE_ENVIRONMENT") + "<br/>";
+            strAppConfigInfoHtml += "InstrumentationKey: " + _config.GetValue<string>("ApplicationInsights:InstrumentationKey") + "<br/>";
+            strAppConfigInfoHtml += "BuildIdentifier: " + _config.GetValue<string>("BuildIdentifier") + "<br/><br/>";
+            strAppConfigInfoHtml += "<a href='/'>Home</a>" + "<br/>";
+            strAppConfigInfoHtml += "<hr></body></html>";
+
+            return strAppConfigInfoHtml;
+        }
     }
+
 }
