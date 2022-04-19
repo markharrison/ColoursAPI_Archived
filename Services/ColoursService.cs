@@ -11,9 +11,13 @@ namespace ColoursAPI.Services
     {
         private List<ColoursItem> _listColors = new() {  };  // This will only work for a single instance of the service ... to be replaced by datastore
 
-        public ColoursService(IConfiguration config)
+        private AppConfig _appconfig;
+
+        public ColoursService(AppConfig appconfig)
         {
             _ = Reset();
+
+            _appconfig = appconfig;
 
             return;
         }

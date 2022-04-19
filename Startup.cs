@@ -11,22 +11,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ColoursAPI.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace ColoursAPI
 {
     public class Startup
     {
+
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            config = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        public IConfiguration config { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<ColoursService>(new ColoursService(Configuration));
+
+            services.AddSingleton<AppConfig>(op =>
+            {
+                AppConfig appconfig = new AppConfig(config);
+
+                services.AddSingleton(new ColoursService(appconfig));
+
+                return appconfig;
+            });
+
             services.AddControllers();
             services.AddCors();
             services.AddSwaggerGen(c =>
@@ -36,12 +47,12 @@ namespace ColoursAPI
                     Title = "Mark Harrison Colours API",
                     Version = "v1",
                     Description = "Colours API",
-                    TermsOfService = new Uri("https://github.com/markharrison"),
+                    TermsOfService = new Uri("https://github.com/markharrison/ColourAPI/blob/master/LICENSE"),
                     Contact = new OpenApiContact
                     {
                         Name = "Mark Harrison",
                         Email = "mark.coloursapi@harrison.ws",
-                        Url = new Uri("https://github.com/markharrison"),
+                        Url = new Uri("https://github.com/markharrison/coloursapi"),
                     },
                     License = new OpenApiLicense
                     {
@@ -53,7 +64,7 @@ namespace ColoursAPI
 
                 c.EnableAnnotations();
 
-                string strURL = Configuration.GetValue<string>("ServerURL");
+                string strURL = config.GetValue<string>("ServerURL");
                 if (strURL != null && strURL != "")
                 {
                     c.AddServer(new OpenApiServer()
@@ -65,7 +76,7 @@ namespace ColoursAPI
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, AppConfig appconfig)
         {
             if (env.IsDevelopment())
             {
@@ -87,10 +98,9 @@ namespace ColoursAPI
 
             app.UseRouting();
 
-            app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapGet("/appconfiginfo", async context => await context.Response.WriteAsync(appconfig.GetAppConfigInfo()));
                 endpoints.MapControllers();
             });
         }
