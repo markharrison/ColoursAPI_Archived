@@ -2,7 +2,9 @@
 
 ![](docs/imgColoursAPI1.png)
 
-Updated to .NET 6.0
+19 April 2022 : Updated to .NET 6.0
+
+Demo: https://coloursapi.azurewebsites.net
 
 Also see: <https://github.com/markharrison/ColoursWeb>
 
