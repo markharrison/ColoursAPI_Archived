@@ -11,34 +11,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    
-    - uses: actions/setup-node@v2
-      with:
-        node-version: 16    
-
-    - name: Install npm packages 
-      run: |
-        npm config set package-lock false
-        npm i
-        npm install -g grunt-cli
-      
-    - name: run grunt build - to process LESS, compress JS and CSS 
-      run: grunt build --verbose
-
-    - name: push any changes
-      run: | 
-        if expr $(git status --porcelain | wc -l) \> 0
-        then 
-          git status --porcelain  
-          git config user.email "markharrison-GitHubAction@users.noreply.github.com"
-          git config user.name "markharrison-GitHubAction"
-          git add .
-          git commit -m "Grunt Build (Action ${{ github.run_number }})"
-          git push
-        else 
-          echo "Working tree clean. Nothing to commit."
-        fi     
-        
+            
     - name: format IMAGETAG
       run: |
         echo "IMAGETAG=$(date "+%Y%m%d")-${{github.run_number }}" >> $GITHUB_ENV
