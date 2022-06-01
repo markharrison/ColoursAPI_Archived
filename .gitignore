@@ -261,7 +261,6 @@ __pycache__/
 *.pyc
 
 # MH
-/Properties/launchSettings.json
 /appsettings.Development.json
 /package-lock.json
 .vscode/
