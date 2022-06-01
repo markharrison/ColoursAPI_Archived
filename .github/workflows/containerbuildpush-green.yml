@@ -50,6 +50,6 @@ jobs:
         push: true
         tags:  >
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGENAME }}:${{ env.IMAGETAG }}, 
-          ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGENAME }}:blue,
+          ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGENAME }}:green,
           ghcr.io/${{ github.repository_owner }}/${{ env.IMAGENAME }}:${{ env.IMAGETAG }}, 
-          ghcr.io/${{ github.repository_owner }}/${{ env.IMAGENAME }}:blue
+          ghcr.io/${{ github.repository_owner }}/${{ env.IMAGENAME }}:green
