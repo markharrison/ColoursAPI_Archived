@@ -15,9 +15,10 @@ namespace ColoursAPI.Services
 
         public ColoursService(IConfiguration config)
         {
-            _ = Reset();
-
+ 
             _config = config;
+
+            _ = Reset();
 
             return;
         }
