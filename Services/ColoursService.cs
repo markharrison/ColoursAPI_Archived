@@ -125,10 +125,9 @@ namespace ColoursAPI.Services
         {
             await DeleteAll();
 
-            await UpdateById(1, new ColoursItem { Id = 1, Name = "blue", Data = null }); ;
-            await UpdateById(2, new ColoursItem { Id = 2, Name = "darkblue", Data = null });
-            await UpdateById(3, new ColoursItem { Id = 2, Name = "lightblue", Data = null });
-
+            await UpdateById(1, new ColoursItem { Id = 1, Name = _config.GetValue<string>("Colour1"), Data = null }); 
+            await UpdateById(2, new ColoursItem { Id = 2, Name = _config.GetValue<string>("Colour2"), Data = null });
+            await UpdateById(3, new ColoursItem { Id = 2, Name = _config.GetValue<string>("Colour3"), Data = null });
 
             return null;
 
@@ -148,6 +147,7 @@ namespace ColoursAPI.Services
             strAppConfigInfoHtml += "ASPNETCORE_ENVIRONMENT: " + _config.GetValue<string>("ASPNETCORE_ENVIRONMENT") + "<br/>";
             strAppConfigInfoHtml += "InstrumentationKey: " + _config.GetValue<string>("ApplicationInsights:InstrumentationKey") + "<br/>";
             strAppConfigInfoHtml += "BuildIdentifier: " + _config.GetValue<string>("BuildIdentifier") + "<br/><br/>";
+            strAppConfigInfoHtml += "Default Colours: " + _config.GetValue<string>("Colour1") + "|"  + _config.GetValue<string>("Colour2") + "|" + _config.GetValue<string>("Colour3") + "<br/><br/>";
             strAppConfigInfoHtml += "<a href='/'>Home</a>" + "<br/>";
             strAppConfigInfoHtml += "<hr></body></html>";
 

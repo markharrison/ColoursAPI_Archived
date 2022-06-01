@@ -21,6 +21,9 @@ jobs:
         files: '["appsettings.json"]'
       env:
         BuildIdentifier: ${{ env.IMAGETAG }}    
+        Colour1: "blue" 
+        Colour2: "lightblue" 
+        Colour3: "darkblue" 
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
@@ -48,5 +51,7 @@ jobs:
         tags:  >
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGENAME }}:${{ env.IMAGETAG }}, 
           ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGENAME }}:latest,
+          ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGENAME }}:blue,
           ghcr.io/${{ github.repository_owner }}/${{ env.IMAGENAME }}:${{ env.IMAGETAG }}, 
-          ghcr.io/${{ github.repository_owner }}/${{ env.IMAGENAME }}:latest
+          ghcr.io/${{ github.repository_owner }}/${{ env.IMAGENAME }}:latest,
+          ghcr.io/${{ github.repository_owner }}/${{ env.IMAGENAME }}:blue
