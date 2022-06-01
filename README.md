@@ -10,4 +10,8 @@ Demo: https://coloursapi.azurewebsites.net
 
 Also see: <https://github.com/markharrison/ColoursWeb>
 
-[![Container Build & Push - ColoursAPI](https://github.com/markharrison/ColoursAPI/workflows/Container%20Build%20&%20Push%20-%20ColoursAPI/badge.svg)](https://github.com/markharrison/ColoursAPI/actions/workflows/containerbuildpush.yml)
+Images: <https://github.com/markharrison/ColoursAPI/pkgs/container/coloursapi>
+
+- docker pull ghcr.io/markharrison/coloursapi:latest
+- docker pull ghcr.io/markharrison/coloursapi:blue
+- docker pull ghcr.io/markharrison/coloursapi:green
