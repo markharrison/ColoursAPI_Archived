@@ -1,4 +1,4 @@
-name: Container Build & Push - ColoursAPI
+name: Container Build & Push - ColoursAPI - Green
 on:
   workflow_dispatch:
   
