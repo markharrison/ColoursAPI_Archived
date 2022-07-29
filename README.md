@@ -15,3 +15,8 @@ Images: <https://github.com/markharrison/ColoursAPI/pkgs/container/coloursapi>
 - docker pull ghcr.io/markharrison/coloursapi:latest
 - docker pull ghcr.io/markharrison/coloursapi:blue
 - docker pull ghcr.io/markharrison/coloursapi:green
+
+
+## Package 
+
+<https://github.com/markharrison/ColoursAPI/pkgs/container/coloursapi>

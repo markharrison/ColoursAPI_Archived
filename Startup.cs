@@ -38,32 +38,25 @@ namespace ColoursAPI
                     Title = "Mark Harrison Colours API",
                     Version = "v1",
                     Description = "Colours API",
-                    TermsOfService = new Uri("https://github.com/markharrison/ColourAPI/blob/master/LICENSE"),
+                    TermsOfService = new Uri("https://github.com/markharrison/ColoursAPI/blob/master/LICENSE"),
                     Contact = new OpenApiContact
                     {
                         Name = "Mark Harrison",
                         Email = "mark.coloursapi@harrison.ws",
-                        Url = new Uri("https://github.com/markharrison/coloursapi"),
+                        Url = new Uri("https://github.com/markharrison/ColoursAPI"),
                     },
                     License = new OpenApiLicense
                     {
                         Name = "Use under MIT License",
-                        Url = new Uri("https://github.com/markharrison/ColourAPI/blob/master/LICENSE"),
+                        Url = new Uri("https://github.com/markharrison/ColoursAPI/blob/master/LICENSE"),
                     }
                 }
                 );
 
                 c.EnableAnnotations();
 
-                string strURL = config.GetValue<string>("ServerURL");
-                if (strURL != null && strURL != "")
-                {
-                    c.AddServer(new OpenApiServer()
-                    {
-                        Url = strURL
-                    });
-                }
             });
+            services.AddApplicationInsightsTelemetry();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -80,7 +73,23 @@ namespace ColoursAPI
                       .AllowAnyHeader()
                       .AllowAnyMethod());
 
-            app.UseSwagger();
+            app.UseSwagger(c =>
+            {
+                c.PreSerializeFilters.Add((swaggerDoc, httpRequest) =>
+                {
+                    var basePath = "/";
+                    var host = httpRequest.Host.Value;
+                    var scheme = (httpRequest.IsHttps || httpRequest.Headers["x-forwarded-proto"].ToString() == "https") ? "https" : "http";
+
+                    if (httpRequest.Headers["x-forwarded-host"].ToString() != "")
+                    {
+                        host = httpRequest.Headers["x-forwarded-host"].ToString() + ":" + httpRequest.Headers["x-forwarded-port"].ToString();
+                    }
+
+                    swaggerDoc.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{scheme}://{host}{basePath}" } };
+
+                });
+            });
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Mark Harrison Colours API V1");
@@ -91,7 +100,7 @@ namespace ColoursAPI
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/appconfiginfo", async context => await context.Response.WriteAsync(cs.GetAppConfigInfo()));
+                endpoints.MapGet("/appconfiginfo", async context => await context.Response.WriteAsync(cs.GetAppConfigInfo(context)));
                 endpoints.MapControllers();
             });
         }
