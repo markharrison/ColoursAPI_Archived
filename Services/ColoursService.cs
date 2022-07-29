@@ -163,7 +163,7 @@ namespace ColoursAPI.Services
             if (_config.GetValue<string>("AdminPW") == context.Request.Query["pw"].ToString())
             {
                 strHtml += EchoData("ASPNETCORE_ENVIRONMENT", _config.GetValue<string>("ASPNETCORE_ENVIRONMENT"));
-                strHtml += EchoData("ApplicationInsights ConnectionString", _config.GetValue<string>("ApplicationInsights:ConnectionString"));
+                strHtml += EchoData("APPLICATIONINSIGHTS_CONNECTION_STRING", _config.GetValue<string>("APPLICATIONINSIGHTS_CONNECTION_STRING"));
                 strHtml += EchoData("Default Colours", _config.GetValue<string>("Colour1") + " | " + _config.GetValue<string>("Colour2") + " | " + _config.GetValue<string>("Colour3"));             
             }
 
